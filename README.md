@@ -1,8 +1,15 @@
 # 📦 NAS_SERVER
 
-> 개인 PC에서 NAS 서버를 구축하는 프로젝트입니다. FastAPI와 Supabase를 활용하여 구축합니다.
+> # 📦 NAS_SERVER
 
-This is a project to build NAS servers on personal PCs, leveraging **FastAPI** and **Supabase**.
+> 개인 PC에서 NAS 서버를 구축하는 프로젝트입니다. **FastAPI**와 **Supabase**를 활용하여 구축합니다. 저는 **WSL**에서 구현하였고, WSL과 윈도우 port연결 후 공유기의 DNS를 이용하여, **https** 설정하여 외부에서 https로 접속이 가능하도록 구현하였습니다.
+
+서버 API만 1차적으록 구현 하였고, WEB , APP 버전도 추 후 공개 예정입니다.
+
+This is a project to build NAS servers on personal PCs, leveraging 
+It is a project to build a NAS server from a personal PC. It is built using **FastAPI** and **Supabase**. I implemented it in WSL, and after connecting WSL and Windows port, I set up https using the DNS of the router to enable access to https from outside.
+
+Only the server API was first implemented, and the WEB and APP versions will be released later.
 
 ---
 
@@ -15,9 +22,12 @@ pip3 install "uvicorn[standard]"
 ```
 
 ### 🗄 Supabase 설치
-> **주의:**
-> - `POSTGRES_PASSWORD` -> SHA-256으로 인코딩된 값 사용
-> - `VAULT_ENC_KEY` -> AES-256 키 사용
+
+> **⚠️ 주의:**
+> - `POSTGRES_PASSWORD` → **SHA-256으로 인코딩된 값 사용**
+> - `VAULT_ENC_KEY` → **AES-256 키 사용**
+
+📌 Supabase 공식 문서를 참고하여 개인 설정 진행: [Supabase Self-Hosting Guide](https://supabase.com/docs/guides/self-hosting/docker)
 
 ```bash
 git clone --filter=blob:none --no-checkout https://github.com/supabase/supabase
@@ -35,41 +45,25 @@ docker compose pull
 
 # 서비스 시작 (백그라운드 실행)
 docker compose up -d
-
-# 전체 컨테이너 삭제
-docker rm $(docker ps -a -q)
-
-# 전체 이미지 삭제
-docker rmi $(docker images -q)
 ```
-
-#### 🚨 ERROR 발생 시
-```bash
-** (ErlangError) Erlang error: {:badarg, {'aead.c', 90}, 'Unknown cipher or invalid key size'}:
-
-  * 1st argument: Unknown cipher or invalid key size
-
-    (crypto 5.1.3) crypto.erl:985: :crypto.crypto_one_time_aead(:aes_256_gcm, "gD1Yx2DSR8IBUnzsPcOjwCQqbAmA5IF+C/0c5/B1/P8=", <<88, 118, 194, 91, 119, 3, 195, 101, 41, 219, 189, 136, 12, 141, 49, 93>>, "0ce939249d02573e51e022df82e27bfd2db209be30fb21e04239a6361a49b491", "AES256GCM", 16, true)
-    (cloak 1.1.2) lib/cloak/ciphers/aes_gcm.ex:47: Cloak.Ciphers.AES.GCM.encrypt/2
-    (supavisor 1.1.56) lib/cloak_ecto/type.ex:37: Supavisor.Encrypted.Binary.dump/1
-    (ecto 3.10.3) lib/ecto/type.ex:931: Ecto.Type.process_dumpers/3
-    (ecto 3.10.3) lib/ecto/repo/schema.ex:1015: Ecto.Repo.Schema.dump_field!/6
-    (ecto 3.10.3) lib/ecto/repo/schema.ex:1028: anonymous fn/6 in Ecto.Repo.Schema.dump_fields!/5
-    (stdlib 4.3) maps.erl:411: :maps.fold_1/3
-    nofile:29: (file)
-```
----
-
-### ✅ 해결 방법
-```bash
-VAULT_ENC_KEY -> key를 ase_256키 생성 -> base64 인코딩 -> 해당 값을 .env에 넣기기
-```
-
-
 
 ---
 
-## 🔑 Admin 권한 설정
+## 🔑 Supabase 설정
+
+### 1️⃣ **Supabase-Kong 접속**
+- 접속 주소: `http://localhost:8000`
+
+### 2️⃣ **로그인**
+- `supabase/docker/.env`에 설정된 계정으로 로그인
+
+### 3️⃣ **Auth 계정 등록**
+- 접속 주소: `http://localhost:8000/project/default/auth/users`
+
+### 4️⃣ **Admin 권한 설정**
+- 접속 주소: `http://localhost:8000/project/default/sql/1`
+- SQL 쿼리 실행:
+
 ```sql
 CREATE TABLE roles (
   id UUID REFERENCES auth.users ON DELETE CASCADE,
@@ -97,57 +91,58 @@ USING (EXISTS (
 
 ---
 
-## 🗄 Create Bucket Policy
+## 🗄 Create Bucket Policy (스토리지 정책 설정)
+
 ```sql
 -- 버킷 정책
-CREATE POLICY "Enable bucket creation for service role" 
+CREATE POLICY "Enable bucket creation for service role"
 ON storage.buckets
-FOR INSERT 
+FOR INSERT
 TO authenticated
 WITH CHECK ( auth.role() = 'authenticated' OR auth.role() = 'service_role' );
 
-CREATE POLICY "Enable bucket select for service role" 
+CREATE POLICY "Enable bucket select for service role"
 ON storage.buckets
-FOR SELECT 
+FOR SELECT
 TO authenticated
 USING ( auth.role() = 'authenticated' OR auth.role() = 'service_role' );
 
-CREATE POLICY "Enable bucket update for service role" 
+CREATE POLICY "Enable bucket update for service role"
 ON storage.buckets
-FOR UPDATE 
+FOR UPDATE
 TO authenticated
 USING ( auth.role() = 'authenticated' OR auth.role() = 'service_role' )
 WITH CHECK ( auth.role() = 'authenticated' OR auth.role() = 'service_role' );
 
-CREATE POLICY "Enable bucket delete for service role" 
+CREATE POLICY "Enable bucket delete for service role"
 ON storage.buckets
-FOR DELETE 
+FOR DELETE
 TO authenticated
 USING ( auth.role() = 'authenticated' OR auth.role() = 'service_role' );
 
 -- 오브젝트 정책
-CREATE POLICY "Enable object insert for service role" 
+CREATE POLICY "Enable object insert for service role"
 ON storage.objects
-FOR INSERT 
+FOR INSERT
 TO authenticated
 WITH CHECK ( auth.role() = 'authenticated' OR auth.role() = 'service_role' );
 
-CREATE POLICY "Enable object select for service role" 
+CREATE POLICY "Enable object select for service role"
 ON storage.objects
-FOR SELECT 
+FOR SELECT
 TO authenticated
 USING ( auth.role() = 'authenticated' OR auth.role() = 'service_role' );
 
-CREATE POLICY "Enable object update for service role" 
+CREATE POLICY "Enable object update for service role"
 ON storage.objects
-FOR UPDATE 
+FOR UPDATE
 TO authenticated
 USING ( auth.role() = 'authenticated' OR auth.role() = 'service_role' )
 WITH CHECK ( auth.role() = 'authenticated' OR auth.role() = 'service_role' );
 
-CREATE POLICY "Enable object delete for service role" 
+CREATE POLICY "Enable object delete for service role"
 ON storage.objects
-FOR DELETE 
+FOR DELETE
 TO authenticated
 USING ( auth.role() = 'authenticated' OR auth.role() = 'service_role' );
 ```
@@ -155,5 +150,10 @@ USING ( auth.role() = 'authenticated' OR auth.role() = 'service_role' );
 ---
 
 ## 🚀 빠른 시작 (Quick Start)
+
 ```bash
 docker compose up -d
+```
+
+> 💡 **Tip:** 모든 서비스가 정상적으로 실행되었는지 확인하려면 `docker ps`를 실행하세요.
+
