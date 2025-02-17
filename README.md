@@ -13,6 +13,9 @@ Only the server API was first implemented, and the WEB and APP versions will be 
 
 ---
 
+[구글 스프레드시트 보기](https://docs.google.com/spreadsheets/d/e/2PACX-1vTUklq0EeNiHzqqw37IvZkHaM6BSG68wkQzLh1aZJ8S8_HZM9OoJhJfFRE-KMAV0JKi65dJ_NdO5DzS/pubhtml?gid=481048107&single=true)
+
+
 ## ⚙️ 요구 사항 (Requirements)
 
 ### 🏗 FastAPI 설치
