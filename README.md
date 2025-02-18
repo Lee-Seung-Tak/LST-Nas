@@ -12,10 +12,10 @@ It is a project to build a NAS server from a personal PC. It is built using **Fa
 Only the server API was first implemented, and the WEB and APP versions will be released later.
 
 ---
----
+
 ## [API 사용법]
 ### 보러가기(https://docs.google.com/spreadsheets/d/e/2PACX-1vTUklq0EeNiHzqqw37IvZkHaM6BSG68wkQzLh1aZJ8S8_HZM9OoJhJfFRE-KMAV0JKi65dJ_NdO5DzS/pubhtml?gid=481048107&single=true)
----
+
 
 ## ⚙️ 요구 사항 (Requirements)
 
