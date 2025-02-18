@@ -14,7 +14,7 @@ Only the server API was first implemented, and the WEB and APP versions will be 
 ---
 ---
 ## [API 사용법]
-###(https://docs.google.com/spreadsheets/d/e/2PACX-1vTUklq0EeNiHzqqw37IvZkHaM6BSG68wkQzLh1aZJ8S8_HZM9OoJhJfFRE-KMAV0JKi65dJ_NdO5DzS/pubhtml?gid=481048107&single=true) <<<
+(https://docs.google.com/spreadsheets/d/e/2PACX-1vTUklq0EeNiHzqqw37IvZkHaM6BSG68wkQzLh1aZJ8S8_HZM9OoJhJfFRE-KMAV0JKi65dJ_NdO5DzS/pubhtml?gid=481048107&single=true) <<<
 ---
 
 ## ⚙️ 요구 사항 (Requirements)
